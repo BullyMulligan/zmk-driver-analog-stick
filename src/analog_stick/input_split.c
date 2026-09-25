@@ -14,7 +14,6 @@
 #include <zephyr/input/input.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/version.h>
 
 LOG_MODULE_DECLARE(zmk_analog_stick, CONFIG_ZMK_ANALOG_STICK_LOG_LEVEL);
 
@@ -60,17 +59,10 @@ int zmk_analog_stick_split_report_peripheral_event(uint8_t reg, uint8_t type,
 
 #include <zmk/split/peripheral.h>
 
-/* Zephyr version compat: 3.5 = 2-arg INPUT_CALLBACK_DEFINE, 4.x = 3-arg
- * (input_callback.h was merged into input.h, so __has_include no longer works) */
-#if ZEPHYR_VERSION_MAJOR >= 4
+/* INPUT_CALLBACK_DEFINE is 3-arg since Zephyr 4.1 (fork targets Zephyr 4.x) */
 #define SPLIT_INPUT_CB_DEFINE(dev, cb) INPUT_CALLBACK_DEFINE(dev, cb, NULL)
 #define SPLIT_INPUT_CB_SIG(name) \
     static void name(struct input_event *evt, void *user_data)
-#else
-#define SPLIT_INPUT_CB_DEFINE(dev, cb) INPUT_CALLBACK_DEFINE(dev, cb)
-#define SPLIT_INPUT_CB_SIG(name) \
-    static void name(struct input_event *evt)
-#endif
 
 /* Legacy per-event peripheral handler */
 #define SPLIT_INST(n)                                                          \

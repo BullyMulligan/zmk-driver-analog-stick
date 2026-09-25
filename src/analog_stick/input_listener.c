@@ -14,7 +14,6 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util_macro.h>
-#include <zephyr/version.h>
 
 #include <zmk/keymap.h>
 
@@ -30,23 +29,12 @@
 LOG_MODULE_REGISTER(zmk_analog_stick_listener, CONFIG_ZMK_ANALOG_STICK_LOG_LEVEL);
 
 /* -------------------------------------------------------------------------- */
-/* Zephyr version compatibility                                               */
-/* Zephyr 3.5: INPUT_CALLBACK_DEFINE(dev, cb)        — 2 args, no user_data  */
-/* Zephyr 4.1: INPUT_CALLBACK_DEFINE(dev, cb, udata) — 3 args, with user_data*/
+/* INPUT_CALLBACK_DEFINE is 3-arg since Zephyr 4.1 (fork targets Zephyr 4.x)  */
 /* -------------------------------------------------------------------------- */
 
-#if ZEPHYR_VERSION_MAJOR >= 4
-/* Zephyr 4.x+ — 3-arg form with user_data
- * (input_callback.h was merged into input.h, so __has_include no longer works) */
 #define ANALOG_STICK_INPUT_CB_DEFINE(dev, cb) INPUT_CALLBACK_DEFINE(dev, cb, NULL)
 #define ANALOG_STICK_INPUT_CB_SIG(name) \
     static void name(struct input_event *evt, void *user_data)
-#else
-/* Zephyr 3.5 — 2-arg form, no user_data */
-#define ANALOG_STICK_INPUT_CB_DEFINE(dev, cb) INPUT_CALLBACK_DEFINE(dev, cb)
-#define ANALOG_STICK_INPUT_CB_SIG(name) \
-    static void name(struct input_event *evt)
-#endif
 
 /* -------------------------------------------------------------------------- */
 /* Per-layer configuration (from devicetree child nodes)                      */

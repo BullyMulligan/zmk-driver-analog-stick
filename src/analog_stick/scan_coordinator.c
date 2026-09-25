@@ -202,7 +202,11 @@ static void scan_coordinator_work_handler(struct k_work *work) {
     }
 
     /* --- Phase 3: HID flush (one combined report for all sticks) --- */
+    /* HID/pointing only exists on central (or non-split) ZMK builds;
+     * peripherals forward raw input events via zmk,analog-stick-split. */
+#if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
     zmk_analog_stick_hid_flush();
+#endif
 
     /* --- Phase 4: Adaptive rate selection and pulse-read management --- */
     bool any_active = false;
